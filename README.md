@@ -159,7 +159,4 @@ eas build -p android --profile preview
 
 ## 👨‍💻 Author
 
-Shahiduddin (Shaho)  
-Computer Engineering Student  
-VCET, Vasai  
----
+Shahiduddin (Shaho) – VCET Vasai
