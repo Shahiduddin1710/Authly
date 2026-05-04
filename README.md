@@ -156,7 +156,7 @@ eas build -p android --profile preview
 </p>
 
 <p align="center">
-  <img src="./snapshots/Add-Account.png" width="200"/>
+  <img src="./snapshots/add-account.png" width="200"/>
   <img src="./snapshots/Cloud-Sync.png" width="200"/>
   <img src="./snapshots/Profile.png" width="200"/>
 </p>
