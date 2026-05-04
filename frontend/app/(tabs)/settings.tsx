@@ -1,29 +1,32 @@
+import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as ImagePicker from "expo-image-picker";
+import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
   Alert,
+  Image,
   Modal,
-  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { router } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
-
 export default function SettingsScreen() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [profileVisible, setProfileVisible] = useState(false);
+  const [avatarUri, setAvatarUri] = useState<string | null>(null);
 
   useEffect(() => {
     const load = async () => {
       const name = await AsyncStorage.getItem("fullName");
       const mail = await AsyncStorage.getItem("email");
+      const avatar = await AsyncStorage.getItem("avatarUri");
       setFullName(name || "");
       setEmail(mail || "");
+      setAvatarUri(avatar || null);
     };
     load();
   }, []);
@@ -45,26 +48,55 @@ export default function SettingsScreen() {
           },
         },
       ],
-      { cancelable: true }
+      { cancelable: true },
     );
+  };
+
+  const handlePickImage = async () => {
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permission.granted) {
+      Alert.alert(
+        "Permission required",
+        "Please allow access to your photo library.",
+      );
+      return;
+    }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+    if (!result.canceled) {
+      const uri = result.assets[0].uri;
+      setAvatarUri(uri);
+      await AsyncStorage.setItem("avatarUri", uri);
+    }
   };
 
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
         <View style={styles.brandRow}>
-          <Ionicons name="shield-checkmark" size={18} color="#2563eb" />
-          <Text style={styles.brandName}>SafeAuth</Text>
+          <Ionicons name="shield-checkmark" size={18} color="#0e1f42" />
+          <Text style={styles.brandName}>Authly</Text>
         </View>
         <Text style={styles.headerTitle}>Settings</Text>
       </View>
 
       <View style={styles.profileCard}>
-        <View style={styles.avatar}>
-          <Text style={styles.avatarText}>
-            {fullName ? fullName[0].toUpperCase() : "?"}
-          </Text>
-        </View>
+        <TouchableOpacity style={styles.avatar} onPress={handlePickImage}>
+          {avatarUri ? (
+            <Image source={{ uri: avatarUri }} style={styles.avatarImage} />
+          ) : (
+            <Text style={styles.avatarText}>
+              {fullName ? fullName[0].toUpperCase() : "?"}
+            </Text>
+          )}
+          <View style={styles.avatarEditBadge}>
+            <Ionicons name="camera" size={10} color="#fff" />
+          </View>
+        </TouchableOpacity>
         <View style={{ flex: 1 }}>
           <Text style={styles.profileName}>{fullName}</Text>
           <Text style={styles.profileEmail}>{email}</Text>
@@ -112,11 +144,24 @@ export default function SettingsScreen() {
               </TouchableOpacity>
             </View>
 
-            <View style={styles.modalAvatar}>
-              <Text style={styles.modalAvatarText}>
-                {fullName ? fullName[0].toUpperCase() : "?"}
-              </Text>
-            </View>
+            <TouchableOpacity
+              style={styles.modalAvatar}
+              onPress={handlePickImage}
+            >
+              {avatarUri ? (
+                <Image
+                  source={{ uri: avatarUri }}
+                  style={styles.modalAvatarImage}
+                />
+              ) : (
+                <Text style={styles.modalAvatarText}>
+                  {fullName ? fullName[0].toUpperCase() : "?"}
+                </Text>
+              )}
+              <View style={styles.modalAvatarEditBadge}>
+                <Ionicons name="camera" size={12} color="#fff" />
+              </View>
+            </TouchableOpacity>
 
             <View style={styles.detailRow}>
               <View style={styles.detailIconBox}>
@@ -143,12 +188,20 @@ export default function SettingsScreen() {
             <View style={styles.detailDivider} />
 
             <View style={styles.detailRow}>
-              <View style={[styles.detailIconBox, { backgroundColor: "#f0fdf4" }]}>
-                <Ionicons name="checkmark-circle-outline" size={18} color="#059669" />
+              <View
+                style={[styles.detailIconBox, { backgroundColor: "#f0fdf4" }]}
+              >
+                <Ionicons
+                  name="checkmark-circle-outline"
+                  size={18}
+                  color="#059669"
+                />
               </View>
               <View>
                 <Text style={styles.detailLabel}>Account Status</Text>
-                <Text style={[styles.detailValue, { color: "#059669" }]}>Verified</Text>
+                <Text style={[styles.detailValue, { color: "#059669" }]}>
+                  Verified
+                </Text>
               </View>
             </View>
 
@@ -166,7 +219,7 @@ export default function SettingsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#f5f6fa" },
+  container: { flex: 1, backgroundColor: "#f8faff" },
   header: {
     backgroundColor: "#ffffff",
     padding: 20,
@@ -175,9 +228,14 @@ const styles = StyleSheet.create({
     borderBottomColor: "#f1f5f9",
     marginBottom: 16,
   },
-  brandRow: { flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 12 },
-  brandName: { fontSize: 15, fontWeight: "800", color: "#2563eb" },
-  headerTitle: { fontSize: 24, fontWeight: "800", color: "#111827" },
+  brandRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginBottom: 12,
+  },
+  brandName: { fontSize: 15, fontWeight: "800", color: "#0e1f42" },
+  headerTitle: { fontSize: 24, fontWeight: "800", color: "#0e1f42" },
   profileCard: {
     backgroundColor: "#ffffff",
     marginHorizontal: 16,
@@ -198,12 +256,32 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: "#2563eb",
+    backgroundColor: "#0e1f42",
     justifyContent: "center",
     alignItems: "center",
+    position: "relative",
+    overflow: "visible",
   },
   avatarText: { color: "#fff", fontSize: 20, fontWeight: "800" },
-  profileName: { fontSize: 15, fontWeight: "700", color: "#111827" },
+  avatarImage: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 24,
+  },
+  avatarEditBadge: {
+    position: "absolute",
+    bottom: 0,
+    right: 0,
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: "#0e1f42",
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 1.5,
+    borderColor: "#fff",
+  },
+  profileName: { fontSize: 15, fontWeight: "700", color: "#0e1f42" },
   profileEmail: { fontSize: 12, color: "#9ca3af", marginTop: 2 },
   verifiedBadge: {
     flexDirection: "row",
@@ -283,7 +361,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 24,
   },
-  modalTitle: { fontSize: 20, fontWeight: "800", color: "#111827" },
+  modalTitle: { fontSize: 20, fontWeight: "800", color: "#0e1f42" },
   modalClose: {
     width: 32,
     height: 32,
@@ -296,13 +374,33 @@ const styles = StyleSheet.create({
     width: 72,
     height: 72,
     borderRadius: 36,
-    backgroundColor: "#2563eb",
+    backgroundColor: "#0e1f42",
     justifyContent: "center",
     alignItems: "center",
     alignSelf: "center",
     marginBottom: 24,
+    position: "relative",
+    overflow: "visible",
   },
   modalAvatarText: { color: "#fff", fontSize: 28, fontWeight: "800" },
+  modalAvatarImage: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 36,
+  },
+  modalAvatarEditBadge: {
+    position: "absolute",
+    bottom: 0,
+    right: 0,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: "#0e1f42",
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 2,
+    borderColor: "#fff",
+  },
   detailRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -317,7 +415,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  detailLabel: { fontSize: 11, color: "#9ca3af", fontWeight: "600", marginBottom: 3 },
+  detailLabel: {
+    fontSize: 11,
+    color: "#9ca3af",
+    fontWeight: "600",
+    marginBottom: 3,
+  },
   detailValue: { fontSize: 15, fontWeight: "700", color: "#111827" },
   detailDivider: { height: 1, backgroundColor: "#f3f4f6" },
   modalCloseBtn: {

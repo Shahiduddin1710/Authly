@@ -1,21 +1,25 @@
-import React, { useEffect, useState, useCallback } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  TouchableOpacity,
-  ActivityIndicator,
-  RefreshControl,
-  Alert,
-  Clipboard,
-  Image,
-} from "react-native";
-import { router, useFocusEffect } from "expo-router";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from "axios";
-import { Ionicons } from "@expo/vector-icons";
+import VaultSkeleton from "@/components/ui/VaultSkeleton";
 import { API_BASE_URL } from "@/constants/api";
+import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import NetInfo from "@react-native-community/netinfo";
+import axios from "axios";
+import { router, useFocusEffect } from "expo-router";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  Animated,
+  Clipboard,
+  FlatList,
+  Image,
+  RefreshControl,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface Account {
   id: string;
@@ -95,51 +99,107 @@ const getServiceLogo = (name: string): string | null => {
 const getInitials = (name: string) => name.slice(0, 2).toUpperCase();
 
 const getColor = (name: string): string => {
-  const colors = ["#2563eb", "#7c3aed", "#db2777", "#059669", "#d97706", "#dc2626", "#0891b2"];
+  const colors = [
+    "#2563eb",
+    "#7c3aed",
+    "#db2777",
+    "#059669",
+    "#d97706",
+    "#dc2626",
+    "#0891b2",
+  ];
   let hash = 0;
   for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + hash;
   return colors[hash % colors.length];
 };
 
 export default function VaultScreen() {
+  const insets = useSafeAreaInsets();
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [codes, setCodes] = useState<Record<string, string>>({});
   const [timeLeft, setTimeLeft] = useState(30);
-  const [loading, setLoading] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [isOffline, setIsOffline] = useState(false);
   const [uid, setUid] = useState("");
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [logoErrors, setLogoErrors] = useState<Record<string, boolean>>({});
+  const bannerAnim = useRef(new Animated.Value(0)).current;
+  const CACHE_KEY = "vault_accounts_cache";
 
   const fetchCodes = async (accs: Account[]) => {
     const newCodes: Record<string, string> = {};
     await Promise.all(
       accs.map(async (acc) => {
         try {
-          const res = await axios.post(`${API_BASE_URL}/accounts/generate-totp`, {
-            secretKey: acc.secretKey,
-          });
+          const res = await axios.post(
+            `${API_BASE_URL}/accounts/generate-totp`,
+            {
+              secretKey: acc.secretKey,
+            },
+          );
           const data = res.data as { code: string; timeLeft: number };
           newCodes[acc.id] = data.code;
           setTimeLeft(data.timeLeft);
         } catch {
           newCodes[acc.id] = "------";
         }
-      })
+      }),
     );
     setCodes(newCodes);
   };
 
-  const fetchAccounts = async (userId: string) => {
+  const showBanner = () => {
+    Animated.sequence([
+      Animated.timing(bannerAnim, {
+        toValue: 1,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+      Animated.delay(3000),
+      Animated.timing(bannerAnim, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
+
+  const fetchAccounts = async (userId: string, isRefresh = false) => {
+    const netState = await NetInfo.fetch();
+    const online = netState.isConnected && netState.isInternetReachable;
+
+    if (!online) {
+      setIsOffline(true);
+      if (isRefresh) showBanner();
+      const cached = await AsyncStorage.getItem(CACHE_KEY);
+      if (cached) {
+        const parsed: Account[] = JSON.parse(cached);
+        setAccounts(parsed);
+        await fetchCodes(parsed);
+      }
+      setInitialLoading(false);
+      setRefreshing(false);
+      return;
+    }
+
+    setIsOffline(false);
     try {
       const res = await axios.get(`${API_BASE_URL}/accounts/${userId}`);
       const data = res.data as { accounts: Account[] };
       setAccounts(data.accounts);
+      await AsyncStorage.setItem(CACHE_KEY, JSON.stringify(data.accounts));
       await fetchCodes(data.accounts);
     } catch (err) {
-      console.log("fetch error", err);
+      const cached = await AsyncStorage.getItem(CACHE_KEY);
+      if (cached) {
+        const parsed: Account[] = JSON.parse(cached);
+        setAccounts(parsed);
+        await fetchCodes(parsed);
+      }
     } finally {
-      setLoading(false);
+      setInitialLoading(false);
       setRefreshing(false);
     }
   };
@@ -153,10 +213,17 @@ export default function VaultScreen() {
           return;
         }
         setUid(userId);
+        const cached = await AsyncStorage.getItem(CACHE_KEY);
+        if (cached) {
+          const parsed: Account[] = JSON.parse(cached);
+          setAccounts(parsed);
+          setInitialLoading(false);
+          await fetchCodes(parsed);
+        }
         await fetchAccounts(userId);
       };
       load();
-    }, [])
+    }, []),
   );
 
   useEffect(() => {
@@ -172,7 +239,7 @@ export default function VaultScreen() {
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await fetchAccounts(uid);
+    await fetchAccounts(uid, true);
   };
 
   const handleCopy = (id: string, code: string) => {
@@ -188,8 +255,13 @@ export default function VaultScreen() {
         text: "Remove",
         style: "destructive",
         onPress: async () => {
-          await axios.delete(`${API_BASE_URL}/accounts/${uid}/${accountId}`);
-          await fetchAccounts(uid);
+          setDeletingId(accountId);
+          try {
+            await axios.delete(`${API_BASE_URL}/accounts/${uid}/${accountId}`);
+            await fetchAccounts(uid);
+          } finally {
+            setDeletingId(null);
+          }
         },
       },
     ]);
@@ -242,7 +314,9 @@ export default function VaultScreen() {
             </View>
           </View>
           <View style={styles.timerCircle}>
-            <Text style={[styles.timerText, timeLeft <= 5 && { color: "#ef4444" }]}>
+            <Text
+              style={[styles.timerText, timeLeft <= 5 && { color: "#ef4444" }]}
+            >
               {timeLeft}s
             </Text>
           </View>
@@ -275,8 +349,13 @@ export default function VaultScreen() {
             <TouchableOpacity
               style={styles.deleteBtn}
               onPress={() => handleDelete(item.id, item.serviceName)}
+              disabled={deletingId === item.id}
             >
-              <Ionicons name="trash-outline" size={15} color="#ef4444" />
+              {deletingId === item.id ? (
+                <ActivityIndicator size="small" color="#ef4444" />
+              ) : (
+                <Ionicons name="trash-outline" size={15} color="#ef4444" />
+              )}
             </TouchableOpacity>
           </View>
         </View>
@@ -296,22 +375,39 @@ export default function VaultScreen() {
     );
   };
 
+  const bannerTranslateY = bannerAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [-40, 0],
+  });
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <View style={styles.headerLeft}>
-          <Ionicons name="shield-checkmark" size={18} color="#2563eb" />
-          <Text style={styles.brandName}>SafeAuth</Text>
+          <Ionicons name="shield-checkmark" size={18} color="#0e1f42" />
+          <Text style={styles.brandName}>Authly</Text>
         </View>
         <TouchableOpacity onPress={() => router.push("/add-account" as any)}>
           <Ionicons name="ellipsis-vertical" size={20} color="#6b7280" />
         </TouchableOpacity>
       </View>
 
-      {loading ? (
-        <View style={styles.centered}>
-          <ActivityIndicator size="large" color="#2563eb" />
-        </View>
+      {isOffline && (
+        <Animated.View
+          style={[
+            styles.offlineBanner,
+            { transform: [{ translateY: bannerTranslateY }] },
+          ]}
+        >
+          <Ionicons name="cloud-offline-outline" size={14} color="#fff" />
+          <Text style={styles.offlineText}>
+            {" You're offline. Showing last updated data."}
+          </Text>
+        </Animated.View>
+      )}
+
+      {initialLoading ? (
+        <VaultSkeleton />
       ) : accounts.length === 0 ? (
         <View style={styles.empty}>
           <View style={styles.emptyIconBox}>
@@ -339,14 +435,14 @@ export default function VaultScreen() {
             <RefreshControl
               refreshing={refreshing}
               onRefresh={onRefresh}
-              tintColor="#2563eb"
+              tintColor="#0e1f42"
             />
           }
         />
       )}
 
       <TouchableOpacity
-        style={styles.fab}
+        style={[styles.fab, { bottom: Math.max(insets.bottom - 30, 20) }]}
         onPress={() => router.push("/add-account" as any)}
       >
         <Ionicons name="add" size={28} color="#fff" />
@@ -356,7 +452,20 @@ export default function VaultScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#f5f6fa" },
+  container: { flex: 1, backgroundColor: "#f8faff", overflow: "hidden" },
+  offlineBanner: {
+    backgroundColor: "#374151",
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  offlineText: {
+    color: "#fff",
+    fontSize: 12,
+    fontWeight: "600",
+  },
   header: {
     backgroundColor: "#ffffff",
     paddingHorizontal: 20,
@@ -369,9 +478,19 @@ const styles = StyleSheet.create({
     borderBottomColor: "#f1f5f9",
   },
   headerLeft: { flexDirection: "row", alignItems: "center", gap: 8 },
-  brandName: { fontSize: 16, fontWeight: "800", color: "#2563eb" },
-  centered: { flex: 1, justifyContent: "center", alignItems: "center" },
-  empty: { flex: 1, justifyContent: "center", alignItems: "center", padding: 32 },
+  brandName: { fontSize: 16, fontWeight: "800", color: "#0e1f42" },
+  centered: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    display: "none",
+  },
+  empty: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 32,
+  },
   emptyIconBox: {
     width: 80,
     height: 80,
@@ -381,7 +500,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 20,
   },
-  emptyTitle: { fontSize: 20, fontWeight: "800", color: "#111827", marginBottom: 8 },
+  emptyTitle: {
+    fontSize: 20,
+    fontWeight: "800",
+    color: "#0e1f42",
+    marginBottom: 8,
+  },
   emptyText: {
     fontSize: 13,
     color: "#9ca3af",
@@ -390,7 +514,7 @@ const styles = StyleSheet.create({
     marginBottom: 28,
   },
   addBtn: {
-    backgroundColor: "#2563eb",
+    backgroundColor: "#0e1f42",
     borderRadius: 12,
     paddingHorizontal: 24,
     paddingVertical: 14,
@@ -420,25 +544,25 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   accountLeft: { flexDirection: "row", alignItems: "center", gap: 12 },
- iconBox: {
-  width: 46,
-  height: 46,
-  borderRadius: 12,
-  justifyContent: "center",
-  alignItems: "center",
-  overflow: "hidden",
-  backgroundColor: "#f8fafc",
-  borderWidth: 1,
-  borderColor: "#e5e7eb",
-  padding: 6,
-},
-logoImage: {
-  width: "100%" as any,
-  height: "100%" as any,
-  resizeMode: "contain",
-},
+  iconBox: {
+    width: 46,
+    height: 46,
+    borderRadius: 12,
+    justifyContent: "center",
+    alignItems: "center",
+    overflow: "hidden",
+    backgroundColor: "#f8fafc",
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+    padding: 6,
+  },
+  logoImage: {
+    width: "100%" as any,
+    height: "100%" as any,
+    resizeMode: "contain",
+  },
   initials: { fontSize: 14, fontWeight: "800" },
-  serviceName: { fontSize: 14, fontWeight: "700", color: "#111827" },
+  serviceName: { fontSize: 14, fontWeight: "700", color: "#0e1f42" },
   accountEmail: { fontSize: 11, color: "#9ca3af", marginTop: 2 },
   timerCircle: {
     width: 38,
@@ -509,10 +633,10 @@ logoImage: {
     width: 52,
     height: 52,
     borderRadius: 26,
-    backgroundColor: "#2563eb",
+    backgroundColor: "#0e1f42",
     justifyContent: "center",
     alignItems: "center",
-    shadowColor: "#2563eb",
+    shadowColor: "#0e1f42",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.4,
     shadowRadius: 8,

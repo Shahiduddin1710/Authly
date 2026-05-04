@@ -1,13 +1,13 @@
+import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import React from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
   ScrollView,
+  StyleSheet,
+  Text,
   TouchableOpacity,
+  View,
 } from "react-native";
-import { router } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
 
 export default function TermsScreen() {
   return (
@@ -17,89 +17,119 @@ export default function TermsScreen() {
           <Ionicons name="arrow-back" size={20} color="#374151" />
         </TouchableOpacity>
         <View style={styles.brandRow}>
-          <Ionicons name="shield-checkmark" size={18} color="#2563eb" />
-          <Text style={styles.brandName}>SafeAuth</Text>
+          <Ionicons name="shield-checkmark" size={22} color="#0e1f42" />
+          <Text style={styles.brandName}>Authly</Text>
         </View>
         <View style={{ width: 40 }} />
       </View>
 
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
         <Text style={styles.heading}>Terms of Service</Text>
         <Text style={styles.date}>Last updated: April 2, 2026</Text>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>1. Acceptance of Terms</Text>
           <Text style={styles.body}>
-            By downloading, installing, or using SafeAuth, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use our application.
+            By downloading, installing, or using Authly, you agree to be bound
+            by these Terms of Service. If you do not agree to these terms,
+            please do not use our application.
           </Text>
         </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>2. Description of Service</Text>
           <Text style={styles.body}>
-            SafeAuth is a two-factor authentication (2FA) application that securely stores and generates time-based one-time passwords (TOTP) for your online accounts. The service is provided as-is and we reserve the right to modify or discontinue the service at any time.
+            Authly is a two-factor authentication (2FA) application that
+            securely stores and generates time-based one-time passwords (TOTP)
+            for your online accounts. The service is provided as-is and we
+            reserve the right to modify or discontinue the service at any time.
           </Text>
         </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>3. User Responsibilities</Text>
           <Text style={styles.body}>
-            You are responsible for maintaining the confidentiality of your account credentials. You agree not to share your account with others or use the service for any unlawful purpose. You are responsible for all activities that occur under your account.
+            You are responsible for maintaining the confidentiality of your
+            account credentials. You agree not to share your account with others
+            or use the service for any unlawful purpose. You are responsible for
+            all activities that occur under your account.
           </Text>
         </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>4. Security</Text>
           <Text style={styles.body}>
-            While we implement strong security measures, no method of electronic storage is 100% secure. We strongly recommend enabling device-level security such as PIN, fingerprint, or face recognition to protect access to your device and the SafeAuth application.
+            While we implement strong security measures, no method of electronic
+            storage is 100% secure. We strongly recommend enabling device-level
+            security such as PIN, fingerprint, or face recognition to protect
+            access to your device and the SafeAuth application.
           </Text>
         </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>5. Backup & Data Loss</Text>
           <Text style={styles.body}>
-            SafeAuth syncs your data to Firebase cloud storage. However, we strongly recommend you keep backup copies of your 2FA secret keys. We are not liable for any data loss resulting from account deletion, device failure, or service disruption.
+            Authly syncs your data to Firebase cloud storage. However, we
+            strongly recommend you keep backup copies of your 2FA secret keys.
+            We are not liable for any data loss resulting from account deletion,
+            device failure, or service disruption.
           </Text>
         </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>6. Prohibited Activities</Text>
           <Text style={styles.body}>
-            You may not use SafeAuth to store unauthorized credentials, attempt to reverse engineer the application, circumvent any security measures, or use the service for any illegal or harmful activities.
+            You may not use SafeAuth to store unauthorized credentials, attempt
+            to reverse engineer the application, circumvent any security
+            measures, or use the service for any illegal or harmful activities.
           </Text>
         </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>7. Intellectual Property</Text>
           <Text style={styles.body}>
-            All content, features, and functionality of SafeAuth including but not limited to the design, code, and branding are the exclusive property of SafeAuth Global Security Systems and are protected by international copyright laws.
+            All content, features, and functionality of Authly including but not
+            limited to the design, code, and branding are the exclusive property
+            of Authly Global Security Systems and are protected by international
+            copyright laws.
           </Text>
         </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>8. Limitation of Liability</Text>
           <Text style={styles.body}>
-            SafeAuth shall not be liable for any indirect, incidental, special, or consequential damages resulting from the use or inability to use the service, including but not limited to loss of data or account access.
+            Authly shall not be liable for any indirect, incidental, special, or
+            consequential damages resulting from the use or inability to use the
+            service, including but not limited to loss of data or account
+            access.
           </Text>
         </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>9. Termination</Text>
           <Text style={styles.body}>
-            We reserve the right to terminate or suspend your account at any time for violations of these terms. You may also delete your account at any time through the Settings page.
+            We reserve the right to terminate or suspend your account at any
+            time for violations of these terms. You may also delete your account
+            at any time through the Settings page.
           </Text>
         </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>10. Contact</Text>
           <Text style={styles.body}>
-            For any questions regarding these Terms of Service, please contact us at techshaho786@gmail.com
+            For any questions regarding these Terms of Service, please contact
+            us at techshaho786@gmail.com
           </Text>
         </View>
 
         <View style={styles.footer}>
-          <Ionicons name="shield-checkmark" size={20} color="#2563eb" />
-          <Text style={styles.footerText}>© 2024 SafeAuth Global Security Systems</Text>
+          <Ionicons name="shield-checkmark" size={20} color="#0e1f42" />
+          <Text style={styles.footerText}>
+            &copy; 2026 Authly Global Security Systems
+          </Text>
         </View>
       </ScrollView>
     </View>
@@ -127,8 +157,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  brandRow: { flexDirection: "row", alignItems: "center", gap: 8 },
-  brandName: { fontSize: 15, fontWeight: "800", color: "#2563eb" },
+  brandRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  brandName: { fontSize: 17, fontWeight: "800", color: "#0e1f42" },
   content: {
     padding: 24,
     paddingBottom: 48,

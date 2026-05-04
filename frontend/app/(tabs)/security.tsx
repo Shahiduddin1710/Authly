@@ -1,9 +1,18 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, ActivityIndicator } from "react-native";
+import { API_BASE_URL } from "@/constants/api";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
-import { API_BASE_URL } from "@/constants/api";
+
+import React, { useState } from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 export default function SecurityScreen() {
   const [syncing, setSyncing] = useState(false);
@@ -29,8 +38,8 @@ export default function SecurityScreen() {
     <ScrollView style={styles.container}>
       <View style={styles.header}>
         <View style={styles.brandRow}>
-          <Ionicons name="shield-checkmark" size={18} color="#2563eb" />
-          <Text style={styles.brandName}>SafeAuth</Text>
+          <Ionicons name="shield-checkmark" size={18} color="#0e1f42" />
+          <Text style={styles.brandName}>Authly</Text>
         </View>
         <Text style={styles.headerTitle}>Security</Text>
         <Text style={styles.headerSub}>
@@ -61,7 +70,9 @@ export default function SecurityScreen() {
             ) : (
               <Ionicons name="sync-outline" size={18} color="#059669" />
             )}
-            <Text style={styles.syncText}>{syncing ? "Syncing" : "Sync Now"}</Text>
+            <Text style={styles.syncText}>
+              {syncing ? "Syncing" : "Sync Now"}
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -70,18 +81,28 @@ export default function SecurityScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#f5f6fa" },
+  container: { flex: 1, backgroundColor: "#f8faff" },
   header: {
-    backgroundColor: "#ffffff",
+    backgroundColor: "#f8faff",
     padding: 20,
     paddingTop: 56,
     borderBottomWidth: 1,
     borderBottomColor: "#f1f5f9",
     marginBottom: 16,
   },
-  brandRow: { flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 12 },
-  brandName: { fontSize: 15, fontWeight: "800", color: "#2563eb" },
-  headerTitle: { fontSize: 24, fontWeight: "800", color: "#111827", marginBottom: 4 },
+  brandRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginBottom: 12,
+  },
+  brandName: { fontSize: 15, fontWeight: "800", color: "#0e1f42" },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: "800",
+    color: "#0e1f42",
+    marginBottom: 4,
+  },
   headerSub: { fontSize: 12, color: "#9ca3af", lineHeight: 18 },
   section: { padding: 16, gap: 12 },
   statusCard: {

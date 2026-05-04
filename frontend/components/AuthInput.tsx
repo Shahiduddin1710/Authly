@@ -1,13 +1,13 @@
+import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
-  View,
-  TextInput,
-  Text,
-  TouchableOpacity,
   StyleSheet,
+  Text,
+  TextInput,
   TextInputProps,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 
 interface AuthInputProps extends TextInputProps {
   label: string;
@@ -42,15 +42,15 @@ export default function AuthInput({
         {iconName && (
           <Ionicons
             name={iconName}
-            size={16}
-            color={focused ? "#2563eb" : "#9ca3af"}
+            size={18}
+            color={focused ? "#0e1f42" : "#94a3b8"}
             style={styles.icon}
           />
         )}
         <TextInput
           style={styles.input}
           secureTextEntry={secure}
-          placeholderTextColor="#b0b8c1"
+          placeholderTextColor="#94a3b8"
           autoCapitalize="none"
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
@@ -61,7 +61,7 @@ export default function AuthInput({
             <Ionicons
               name={secure ? "eye-off-outline" : "eye-outline"}
               size={18}
-              color="#9ca3af"
+              color="#94a3b8"
             />
           </TouchableOpacity>
         )}
@@ -72,45 +72,48 @@ export default function AuthInput({
 
 const styles = StyleSheet.create({
   wrapper: {
-    marginBottom: 14,
+    marginBottom: 16,
   },
   labelRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 6,
+    alignItems: "center",
+    marginBottom: 8,
   },
   label: {
-    fontSize: 12,
-    color: "#6b7280",
+    fontSize: 14,
+    color: "#0e1f42",
     fontWeight: "600",
-    letterSpacing: 0.5,
-    textTransform: "uppercase",
   },
   rightLabel: {
-    fontSize: 12,
+    fontSize: 13,
     color: "#2563eb",
     fontWeight: "600",
   },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#f3f4f6",
-    borderRadius: 10,
-    paddingHorizontal: 14,
-    height: 50,
+    backgroundColor: "#ffffff",
+    borderRadius: 14,
+    paddingHorizontal: 16,
+    height: 56,
     borderWidth: 1.5,
-    borderColor: "transparent",
+    borderColor: "#e2e8f0",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.04,
+    shadowRadius: 4,
+    elevation: 1,
   },
   inputFocused: {
-    borderColor: "#2563eb",
-    backgroundColor: "#fff",
+    borderColor: "#0e1f42",
   },
   icon: {
-    marginRight: 10,
+    marginRight: 12,
   },
   input: {
     flex: 1,
     fontSize: 15,
-    color: "#111827",
+    color: "#0e1f42",
   },
 });

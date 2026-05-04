@@ -1,21 +1,21 @@
+import AuthInput from "@/components/AuthInput";
+import { API_BASE_URL } from "@/constants/api";
+import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
+import { router } from "expo-router";
 import React, { useState } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
   ActivityIndicator,
   Alert,
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { router } from "expo-router";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from "axios";
-import { Ionicons } from "@expo/vector-icons";
-import { API_BASE_URL } from "@/constants/api";
-import AuthInput from "@/components/AuthInput";
 
 export default function ManualEntryScreen() {
   const [serviceName, setServiceName] = useState("");
@@ -50,7 +50,10 @@ export default function ManualEntryScreen() {
         { text: "OK", onPress: () => router.replace("/(tabs)/vault" as any) },
       ]);
     } catch (err: any) {
-      Alert.alert("Error", err.response?.data?.error || "Failed to save account");
+      Alert.alert(
+        "Error",
+        err.response?.data?.error || "Failed to save account",
+      );
     } finally {
       setLoading(false);
     }
@@ -68,14 +71,16 @@ export default function ManualEntryScreen() {
       >
         <View style={styles.topBar}>
           <View style={styles.brandRow}>
-            <Ionicons name="shield-checkmark" size={18} color="#2563eb" />
-            <Text style={styles.brandName}>SafeAuth</Text>
+            <Ionicons name="shield-checkmark" size={22} color="#0e1f42" />
+            <Text style={styles.brandName}>Authly</Text>
           </View>
         </View>
 
         <View style={styles.card}>
           <Text style={styles.heading}>Add Account</Text>
-          <Text style={styles.subheading}>Enter your security credentials manually</Text>
+          <Text style={styles.subheading}>
+            Enter your security credentials manually
+          </Text>
 
           <AuthInput
             label="Service Name"
@@ -104,9 +109,14 @@ export default function ManualEntryScreen() {
           />
 
           <View style={styles.infoBox}>
-            <Ionicons name="information-circle-outline" size={16} color="#6b7280" />
+            <Ionicons
+              name="information-circle-outline"
+              size={16}
+              color="#6b7280"
+            />
             <Text style={styles.infoText}>
-              Secret keys are provided by the service during 2FA setup. They are stored securely in your vault.
+              Secret keys are provided by the service during 2FA setup. They are
+              stored securely in your vault.
             </Text>
           </View>
 
@@ -125,7 +135,10 @@ export default function ManualEntryScreen() {
             )}
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.cancelBtn} onPress={() => router.back()}>
+          <TouchableOpacity
+            style={styles.cancelBtn}
+            onPress={() => router.back()}
+          >
             <Text style={styles.cancelText}>CANCEL</Text>
           </TouchableOpacity>
         </View>
@@ -148,7 +161,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   brandRow: { flexDirection: "row", alignItems: "center", gap: 8 },
-  brandName: { fontSize: 15, fontWeight: "800", color: "#2563eb" },
+  brandName: { fontSize: 17, fontWeight: "800", color: "#0e1f42" },
   card: {
     backgroundColor: "#ffffff",
     borderRadius: 20,
@@ -163,7 +176,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#f1f5f9",
   },
-  heading: { fontSize: 22, fontWeight: "800", color: "#111827", marginBottom: 4 },
+  heading: {
+    fontSize: 22,
+    fontWeight: "800",
+    color: "#111827",
+    marginBottom: 4,
+  },
   subheading: { fontSize: 13, color: "#9ca3af", marginBottom: 24 },
   infoBox: {
     flexDirection: "row",
@@ -179,7 +197,7 @@ const styles = StyleSheet.create({
   },
   infoText: { flex: 1, fontSize: 12, color: "#6b7280", lineHeight: 18 },
   button: {
-    backgroundColor: "#2563eb",
+    backgroundColor: "#0e1f42",
     borderRadius: 12,
     height: 52,
     justifyContent: "center",
@@ -188,5 +206,10 @@ const styles = StyleSheet.create({
   buttonInner: { flexDirection: "row", alignItems: "center", gap: 8 },
   buttonText: { color: "#fff", fontSize: 15, fontWeight: "700" },
   cancelBtn: { alignItems: "center", marginTop: 16 },
-  cancelText: { color: "#9ca3af", fontSize: 12, fontWeight: "700", letterSpacing: 1 },
+  cancelText: {
+    color: "#9ca3af",
+    fontSize: 12,
+    fontWeight: "700",
+    letterSpacing: 1,
+  },
 });

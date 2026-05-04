@@ -1,11 +1,18 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert } from "react-native";
-import { router } from "expo-router";
+import { API_BASE_URL } from "@/constants/api";
 import { Ionicons } from "@expo/vector-icons";
-import * as ImagePicker from "expo-image-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
-import { API_BASE_URL } from "@/constants/api";
+import * as ImagePicker from "expo-image-picker";
+import { router } from "expo-router";
+import React, { useState } from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 export default function AddAccountScreen() {
   const [scanning, setScanning] = useState(false);
@@ -13,17 +20,20 @@ export default function AddAccountScreen() {
   const handleGalleryUpload = async () => {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permission.granted) {
-      Alert.alert("Permission required", "Please allow access to your photo library.");
+      Alert.alert(
+        "Permission required",
+        "Please allow access to your photo library.",
+      );
       return;
     }
 
-  const result = await ImagePicker.launchImageLibraryAsync({
-  mediaTypes: ImagePicker.MediaTypeOptions.Images,
-  allowsEditing: true,
-  aspect: [1, 1],
-  quality: 1,
-  base64: true,
-});
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+      base64: true,
+    });
 
     if (result.canceled || !result.assets[0]) return;
 
@@ -57,7 +67,11 @@ export default function AddAccountScreen() {
         { text: "OK", onPress: () => router.replace("/(tabs)/vault" as any) },
       ]);
     } catch (err: any) {
-      Alert.alert("Error", err.response?.data?.error || "Could not read QR code. Try manual entry.");
+      Alert.alert(
+        "Error",
+        err.response?.data?.error ||
+          "Could not read QR code. Try manual entry.",
+      );
     } finally {
       setScanning(false);
     }
@@ -71,24 +85,35 @@ export default function AddAccountScreen() {
         <View style={styles.titleRow}>
           <View>
             <Text style={styles.title}>Add Account</Text>
-            <Text style={styles.sub}>Choose how you want to add your new token</Text>
+            <Text style={styles.sub}>
+              Choose how you want to add your new token
+            </Text>
           </View>
-          <TouchableOpacity onPress={() => router.back()} style={styles.closeBtn}>
+          <TouchableOpacity
+            onPress={() => router.back()}
+            style={styles.closeBtn}
+          >
             <Ionicons name="close" size={20} color="#6b7280" />
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity style={styles.option} onPress={handleGalleryUpload} disabled={scanning}>
+        <TouchableOpacity
+          style={styles.option}
+          onPress={handleGalleryUpload}
+          disabled={scanning}
+        >
           <View style={[styles.optionIcon, { backgroundColor: "#eff6ff" }]}>
             {scanning ? (
-              <ActivityIndicator size="small" color="#2563eb" />
+              <ActivityIndicator size="small" color="#0e1f42" />
             ) : (
-              <Ionicons name="image-outline" size={22} color="#2563eb" />
+              <Ionicons name="image-outline" size={22} color="#0e1f42" />
             )}
           </View>
           <View style={styles.optionText}>
             <Text style={styles.optionTitle}>Upload from Gallery</Text>
-            <Text style={styles.optionSub}>Import a QR code from your photo library</Text>
+            <Text style={styles.optionSub}>
+              Import a QR code from your photo library
+            </Text>
           </View>
           <Ionicons name="chevron-forward" size={18} color="#d1d5db" />
         </TouchableOpacity>
@@ -102,12 +127,17 @@ export default function AddAccountScreen() {
           </View>
           <View style={styles.optionText}>
             <Text style={styles.optionTitle}>Enter Manually</Text>
-            <Text style={styles.optionSub}>Type in the secret key provided by the service</Text>
+            <Text style={styles.optionSub}>
+              Type in the secret key provided by the service
+            </Text>
           </View>
           <Ionicons name="chevron-forward" size={18} color="#d1d5db" />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.cancelBtn} onPress={() => router.back()}>
+        <TouchableOpacity
+          style={styles.cancelBtn}
+          onPress={() => router.back()}
+        >
           <Text style={styles.cancelText}>Cancel</Text>
         </TouchableOpacity>
       </View>

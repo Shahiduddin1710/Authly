@@ -1,7 +1,7 @@
-import { useEffect } from "react";
-import { router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { View, ActivityIndicator } from "react-native";
+import { router } from "expo-router";
+import { useEffect } from "react";
+import { View } from "react-native";
 
 export default function Index() {
   useEffect(() => {
@@ -16,9 +16,5 @@ export default function Index() {
     check();
   }, []);
 
-  return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#f0f4f8" }}>
-      <ActivityIndicator size="large" color="#0d7377" />
-    </View>
-  );
+  return <View style={{ flex: 1, backgroundColor: "#0e1f42" }} />;
 }

@@ -1,24 +1,24 @@
-import React, { useState } from "react";
+import { Ionicons } from "@expo/vector-icons";
+import axios from "axios";
+import { router } from "expo-router";
+import React, { useRef, useState } from "react";
 import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
   ActivityIndicator,
+  Alert,
   KeyboardAvoidingView,
+  NativeSyntheticEvent,
   Platform,
   ScrollView,
-  NativeSyntheticEvent,
+  StyleSheet,
+  Text,
+  TextInput,
   TextInputKeyPressEventData,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { router } from "expo-router";
-import axios from "axios";
-import { Ionicons } from "@expo/vector-icons";
-import { useRef } from "react";
-import { API_BASE_URL } from "@/constants/api";
+
 import AuthInput from "@/components/AuthInput";
+import { API_BASE_URL } from "@/constants/api";
 
 type Step = "email" | "otp" | "password";
 
@@ -77,7 +77,10 @@ export default function ForgotPasswordScreen() {
         newPassword,
       });
       Alert.alert("Success", "Password reset successfully!", [
-        { text: "Login", onPress: () => router.replace("/(auth)/login" as any) },
+        {
+          text: "Login",
+          onPress: () => router.replace("/(auth)/login" as any),
+        },
       ]);
     } catch (err: any) {
       Alert.alert("Error", err.response?.data?.error || "Something went wrong");
@@ -95,7 +98,7 @@ export default function ForgotPasswordScreen() {
 
   const handleKeyPress = (
     e: NativeSyntheticEvent<TextInputKeyPressEventData>,
-    idx: number
+    idx: number,
   ) => {
     if (e.nativeEvent.key === "Backspace" && !otp[idx] && idx > 0) {
       inputs.current[idx - 1]?.focus();
@@ -116,13 +119,6 @@ export default function ForgotPasswordScreen() {
           <Ionicons name="arrow-back" size={20} color="#374151" />
         </TouchableOpacity>
 
-        <View style={styles.logoBox}>
-          <View style={styles.logoCircle}>
-            <Ionicons name="lock-open-outline" size={28} color="#2563eb" />
-          </View>
-          <Text style={styles.brandName}>SafeAuth</Text>
-        </View>
-
         <View style={styles.card}>
           {step === "email" && (
             <>
@@ -138,7 +134,11 @@ export default function ForgotPasswordScreen() {
                 value={email}
                 onChangeText={setEmail}
               />
-              <TouchableOpacity style={styles.button} onPress={handleSendOTP} disabled={loading}>
+              <TouchableOpacity
+                style={styles.button}
+                onPress={handleSendOTP}
+                disabled={loading}
+              >
                 {loading ? (
                   <ActivityIndicator color="#fff" />
                 ) : (
@@ -159,7 +159,9 @@ export default function ForgotPasswordScreen() {
                 {otp.map((digit, idx) => (
                   <TextInput
                     key={idx}
-                    ref={(r: TextInput | null) => { inputs.current[idx] = r; }}
+                    ref={(r: TextInput | null) => {
+                      inputs.current[idx] = r;
+                    }}
                     style={[styles.otpBox, digit ? styles.otpBoxFilled : null]}
                     value={digit}
                     onChangeText={(v) => handleOtpChange(v.slice(-1), idx)}
@@ -198,7 +200,11 @@ export default function ForgotPasswordScreen() {
                 value={confirmPassword}
                 onChangeText={setConfirmPassword}
               />
-              <TouchableOpacity style={styles.button} onPress={handleResetPassword} disabled={loading}>
+              <TouchableOpacity
+                style={styles.button}
+                onPress={handleResetPassword}
+                disabled={loading}
+              >
                 {loading ? (
                   <ActivityIndicator color="#fff" />
                 ) : (
@@ -208,7 +214,10 @@ export default function ForgotPasswordScreen() {
             </>
           )}
 
-          <TouchableOpacity style={styles.backToLogin} onPress={() => router.replace("/(auth)/login" as any)}>
+          <TouchableOpacity
+            style={styles.backToLogin}
+            onPress={() => router.replace("/(auth)/login" as any)}
+          >
             <Ionicons name="arrow-back" size={14} color="#2563eb" />
             <Text style={styles.backToLoginText}>Back to Login</Text>
           </TouchableOpacity>
@@ -230,53 +239,35 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
     width: 40,
     height: 40,
-    borderRadius: 20,
+    borderRadius: 12,
     backgroundColor: "#ffffff",
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 24,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  logoBox: {
-    alignItems: "center",
-    marginBottom: 28,
-  },
-  logoCircle: {
-    width: 60,
-    height: 60,
-    borderRadius: 18,
-    backgroundColor: "#eff6ff",
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 12,
     borderWidth: 1,
-    borderColor: "#dbeafe",
+    borderColor: "#e2e8f0",
   },
-  brandName: { fontSize: 20, fontWeight: "800", color: "#2563eb" },
+
   card: {
-    backgroundColor: "#ffffff",
-    borderRadius: 20,
-    padding: 24,
     width: "100%",
     maxWidth: 400,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.06,
-    shadowRadius: 16,
-    elevation: 4,
-    borderWidth: 1,
-    borderColor: "#f1f5f9",
   },
-  heading: { fontSize: 22, fontWeight: "800", color: "#111827", marginBottom: 6 },
-  subheading: { fontSize: 13, color: "#9ca3af", marginBottom: 24, lineHeight: 20 },
+  heading: {
+    fontSize: 22,
+    fontWeight: "800",
+    color: "#111827",
+    marginBottom: 6,
+  },
+  subheading: {
+    fontSize: 13,
+    color: "#9ca3af",
+    marginBottom: 24,
+    lineHeight: 20,
+  },
   button: {
-    backgroundColor: "#2563eb",
-    borderRadius: 12,
-    height: 52,
+    backgroundColor: "#0e1f42",
+    borderRadius: 14,
+    height: 56,
     justifyContent: "center",
     alignItems: "center",
     marginTop: 4,
@@ -297,18 +288,18 @@ const styles = StyleSheet.create({
   },
   otpBox: {
     flex: 1,
-    height: 52,
-    backgroundColor: "#f3f4f6",
-    borderRadius: 10,
-    fontSize: 20,
+    height: 58,
+    backgroundColor: "#ffffff",
+    borderRadius: 14,
+    fontSize: 22,
     fontWeight: "800",
-    color: "#111827",
+    color: "#0e1f42",
     borderWidth: 1.5,
-    borderColor: "transparent",
+    borderColor: "#e2e8f0",
   },
   otpBoxFilled: {
-    borderColor: "#2563eb",
-    backgroundColor: "#eff6ff",
+    borderColor: "#0e1f42",
+    backgroundColor: "#f0f4ff",
   },
   backToLogin: {
     flexDirection: "row",

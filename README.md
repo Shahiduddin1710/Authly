@@ -11,11 +11,13 @@ It allows users to securely store their 2FA accounts, generate real-time OTP cod
 ## ✨ Features
 
 ### 🔑 Authentication
+
 - Email + Password Signup/Login
 - OTP verification via email (Nodemailer)
 - Forgot Password & Reset flow
 
 ### 🔐 2FA Vault
+
 - Add accounts via QR code scanning
 - Manual secret key entry
 - Real-time TOTP generation (30s refresh)
@@ -23,10 +25,12 @@ It allows users to securely store their 2FA accounts, generate real-time OTP cod
 - Edit and delete accounts
 
 ### ☁️ Cloud Sync
+
 - Firebase Firestore integration
 - Secure per-user storage
 
 ### 🎨 UI/UX
+
 - Clean fintech-style design
 - Smooth animations
 - Minimal modern layout
@@ -36,6 +40,7 @@ It allows users to securely store their 2FA accounts, generate real-time OTP cod
 ## 🏗️ Tech Stack
 
 ### Frontend
+
 - React Native (Expo)
 - TypeScript
 - Expo Router
@@ -43,12 +48,14 @@ It allows users to securely store their 2FA accounts, generate real-time OTP cod
 - Axios
 
 ### Backend
+
 - Node.js
 - Express.js
 - Firebase Admin SDK
 - Firestore Database
 
 ### Security & Utilities
+
 - otplib (TOTP)
 - bcryptjs (password hashing)
 - nodemailer (OTP email)
@@ -65,10 +72,10 @@ PORT=5000
 
 FIREBASE_PROJECT_ID=your_project_id  
 FIREBASE_CLIENT_EMAIL=your_client_email  
-FIREBASE_PRIVATE_KEY=your_private_key  
+FIREBASE_PRIVATE_KEY=your_private_key
 
 EMAIL_USER=your_email@gmail.com  
-EMAIL_PASS=your_app_password  
+EMAIL_PASS=your_app_password
 
 ---
 
@@ -77,7 +84,7 @@ EMAIL_PASS=your_app_password
 ### 1. Clone Repository
 
 git clone https://github.com/Shahiduddin1710/Safe-Auth.git  
-cd safeauth  
+cd safeauth
 
 ---
 
@@ -85,7 +92,7 @@ cd safeauth
 
 cd backend  
 npm install  
-npm run dev  
+npm run dev
 
 ---
 
@@ -93,13 +100,13 @@ npm run dev
 
 cd frontend  
 npm install  
-npx expo start  
+npx expo start
 
 ---
 
 ### 4. Run on Android
 
-npx expo run:android  
+npx expo run:android
 
 ---
 
@@ -111,7 +118,7 @@ POST /api/auth/signup
 POST /api/auth/verify-otp  
 POST /api/auth/login  
 POST /api/auth/forgot-password  
-POST /api/auth/reset-password  
+POST /api/auth/reset-password
 
 ### Accounts
 
@@ -120,7 +127,7 @@ POST /api/accounts/scan-qr
 POST /api/accounts/generate-totp  
 GET /api/accounts/:uid  
 DELETE /api/accounts/:uid/:accountId  
-PUT /api/accounts/:uid/:accountId  
+PUT /api/accounts/:uid/:accountId
 
 ---
 
@@ -136,26 +143,25 @@ PUT /api/accounts/:uid/:accountId
 
 ## 📦 Build APK
 
-eas build -p android --profile preview  
+eas build -p android --profile preview
 
 ---
 
 ## 📱 App Screenshots
 
 <p align="center">
-  <img src="./snapshots/login.jpeg" width="200"/>
-  <img src="./snapshots/signup.jpeg" width="200"/>
-  <img src="./snapshots/Dashboard.jpeg" width="200"/>
+  <img src="./snapshots/login.png" width="200"/>
+  <img src="./snapshots/signup.png" width="200"/>
+  <img src="./snapshots/Dashboard.png" width="200"/>
 </p>
 
 <p align="center">
-  <img src="./snapshots/Add-Account.jpeg" width="200"/>
-  <img src="./snapshots/Cloud-Sync.jpeg" width="200"/>
-  <img src="./snapshots/Profile.jpeg" width="200"/>
+  <img src="./snapshots/Add-Account.png" width="200"/>
+  <img src="./snapshots/Cloud-Sync.png" width="200"/>
+  <img src="./snapshots/Profile.png" width="200"/>
 </p>
 
 ---
-
 
 ## 👨‍💻 Author
 

@@ -1,13 +1,13 @@
+import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import React from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
   ScrollView,
+  StyleSheet,
+  Text,
   TouchableOpacity,
+  View,
 } from "react-native";
-import { router } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
 
 export default function PrivacyScreen() {
   return (
@@ -17,75 +17,102 @@ export default function PrivacyScreen() {
           <Ionicons name="arrow-back" size={20} color="#374151" />
         </TouchableOpacity>
         <View style={styles.brandRow}>
-          <Ionicons name="shield-checkmark" size={18} color="#2563eb" />
-          <Text style={styles.brandName}>SafeAuth</Text>
+          <Ionicons name="shield-checkmark" size={22} color="#0e1f42" />
+          <Text style={styles.brandName}>Authly</Text>
         </View>
         <View style={{ width: 40 }} />
       </View>
 
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
         <Text style={styles.heading}>Privacy Policy</Text>
         <Text style={styles.date}>Last updated: April 2, 2026</Text>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>1. Information We Collect</Text>
           <Text style={styles.body}>
-            SafeAuth collects only the information necessary to provide our authentication services. This includes your full name, email address, and encrypted 2FA secret keys. We do not collect any payment information, location data, or unnecessary personal details.
+            Authly collects only the information necessary to provide our
+            authentication services. This includes your full name, email
+            address, and encrypted 2FA secret keys. We do not collect any
+            payment information, location data, or unnecessary personal details.
           </Text>
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>2. How We Use Your Information</Text>
+          <Text style={styles.sectionTitle}>
+            2. How We Use Your Information
+          </Text>
           <Text style={styles.body}>
-            Your information is used solely to provide and improve the SafeAuth service. We use your email address for account verification and password recovery. Your 2FA secret keys are stored encrypted and are never shared with third parties.
+            Your information is used solely to provide and improve the Authly
+            service. We use your email address for account verification and
+            password recovery. Your 2FA secret keys are stored encrypted and are
+            never shared with third parties.
           </Text>
         </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>3. Data Storage & Security</Text>
           <Text style={styles.body}>
-            All data is stored securely on Firebase Firestore with industry-standard encryption. Your passwords are hashed using bcrypt before storage. We implement end-to-end encryption practices to ensure your authentication data remains private and secure.
+            All data is stored securely on Firebase Firestore with
+            industry-standard encryption. Your passwords are hashed using bcrypt
+            before storage. We implement end-to-end encryption practices to
+            ensure your authentication data remains private and secure.
           </Text>
         </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>4. Data Sharing</Text>
           <Text style={styles.body}>
-            We do not sell, trade, or transfer your personal information to third parties. We do not display advertisements. Your data is never shared with advertisers or marketing companies.
+            We do not sell, trade, or transfer your personal information to
+            third parties. We do not display advertisements. Your data is never
+            shared with advertisers or marketing companies.
           </Text>
         </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>5. Your Rights</Text>
           <Text style={styles.body}>
-            You have the right to access, update, or delete your personal data at any time. You can delete your account and all associated data by contacting our support team. We will process your request within 30 days.
+            You have the right to access, update, or delete your personal data
+            at any time. You can delete your account and all associated data by
+            contacting our support team. We will process your request within 30
+            days.
           </Text>
         </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>6. Cookies</Text>
           <Text style={styles.body}>
-            SafeAuth does not use cookies or tracking technologies in our mobile application. We do not track your behavior across other websites or applications.
+            Authly does not use cookies or tracking technologies in our mobile
+            application. We do not track your behavior across other websites or
+            applications.
           </Text>
         </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>7. Changes to This Policy</Text>
           <Text style={styles.body}>
-            We may update this privacy policy from time to time. We will notify you of any significant changes via email or through the app. Continued use of the service after changes constitutes acceptance of the updated policy.
+            We may update this privacy policy from time to time. We will notify
+            you of any significant changes via email or through the app.
+            Continued use of the service after changes constitutes acceptance of
+            the updated policy.
           </Text>
         </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>8. Contact Us</Text>
           <Text style={styles.body}>
-            If you have any questions about this Privacy Policy, please contact us at techshaho786@gmail.com
+            If you have any questions about this Privacy Policy, please contact
+            us at techshaho786@gmail.com
           </Text>
         </View>
 
         <View style={styles.footer}>
-          <Ionicons name="shield-checkmark" size={20} color="#2563eb" />
-          <Text style={styles.footerText}>© 2024 SafeAuth Global Security Systems</Text>
+          <Ionicons name="shield-checkmark" size={20} color="#0e1f42" />
+          <Text style={styles.footerText}>
+            &copy; 2026 Authly Global Security Systems
+          </Text>
         </View>
       </ScrollView>
     </View>
@@ -114,7 +141,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   brandRow: { flexDirection: "row", alignItems: "center", gap: 8 },
-  brandName: { fontSize: 15, fontWeight: "800", color: "#2563eb" },
+  brandName: { fontSize: 17, fontWeight: "800", color: "#0e1f42" },
   content: {
     padding: 24,
     paddingBottom: 48,

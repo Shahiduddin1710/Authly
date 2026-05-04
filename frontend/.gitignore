@@ -32,6 +32,10 @@ yarn-error.*
 
 # local env files
 .env*.local
+.env          # ADD THIS — plain .env bhi ignore hona chahiye
+.env.local
+.env.development
+.env.production
 
 # typescript
 *.tsbuildinfo
@@ -41,3 +45,19 @@ app-example
 # generated native folders
 /ios
 /android
+
+# Build outputs        
+*.apk
+*.aab
+*.ipa
+
+# EAS logs            
+eas-build-*.log
+.eas/build
+
+# VS Code           
+.vscode/
+
+# Yarn               
+.yarn/cache
+.yarn/unplugged
