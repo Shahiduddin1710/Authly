@@ -1,8 +1,8 @@
-# SafeAuth – Secure 2FA Authenticator App
+# Authly – Secure 2FA Authenticator App
 
 ## 🔐 Overview
 
-SafeAuth is a modern, secure, and minimal 2-Factor Authentication (2FA) mobile application built using React Native (Expo) and Node.js.
+Authly is a modern, secure, and minimal 2-Factor Authentication (2FA) mobile application built using React Native (Expo) and Node.js.
 
 It allows users to securely store their 2FA accounts, generate real-time OTP codes, scan QR codes, and sync data with Firebase Firestore.
 
@@ -84,7 +84,7 @@ EMAIL_PASS=your_app_password
 ### 1. Clone Repository
 
 git clone https://github.com/Shahiduddin1710/Safe-Auth.git  
-cd safeauth
+cd Authly
 
 ---
 
