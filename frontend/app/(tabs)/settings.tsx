@@ -1,23 +1,95 @@
+import AuthInput from "@/components/AuthInput";
+import { API_BASE_URL } from "@/constants/api";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   Image,
-  Modal,
+  KeyboardAvoidingView,
+  Linking,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
+type Screen = "main" | "profile" | "security" | "legal" | "changePassword";
+
 export default function SettingsScreen() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [profileVisible, setProfileVisible] = useState(false);
   const [avatarUri, setAvatarUri] = useState<string | null>(null);
+  const [screen, setScreen] = useState<Screen>("main");
+  const [screenHistory, setScreenHistory] = useState<Screen[]>([]);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [pwLoading, setPwLoading] = useState(false);
+  const [pwError, setPwError] = useState("");
+  const [pwSuccess, setPwSuccess] = useState("");
+
+  const navigateTo = (s: Screen) => {
+    setScreenHistory((prev) => [...prev, screen]);
+    setScreen(s);
+  };
+
+const goBack = () => {
+    setScreenHistory((prev) => {
+      const next = [...prev];
+      const last = next.pop();
+      setScreen(last || "main");
+      return next;
+    });
+  };
+
+  const handleChangePassword = async () => {
+    setPwError("");
+    setPwSuccess("");
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      setPwError("All fields are required.");
+      return;
+    }
+    if (newPassword.length < 8) {
+      setPwError("Must be at least 8 characters.");
+      return;
+    }
+    if (!/[A-Z]/.test(newPassword)) {
+      setPwError("Must contain at least one uppercase letter.");
+      return;
+    }
+    if (!/[0-9]/.test(newPassword)) {
+      setPwError("Must contain at least one number.");
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setPwError("Passwords do not match.");
+      return;
+    }
+    setPwLoading(true);
+    try {
+      const uid = await AsyncStorage.getItem("uid");
+      await axios.post(`${API_BASE_URL}/auth/change-password`, {
+        uid,
+        currentPassword,
+        newPassword,
+      });
+      setPwSuccess("Password changed successfully.");
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    } catch (err: any) {
+      setPwError(err.response?.data?.error || "Failed to change password.");
+    } finally {
+      setPwLoading(false);
+    }
+  };
 
   useEffect(() => {
     const load = async () => {
@@ -61,18 +133,247 @@ export default function SettingsScreen() {
       );
       return;
     }
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.8,
-    });
+      const result = await ImagePicker.launchImageLibraryAsync({
+  mediaTypes: ["images"],
+  allowsEditing: true,
+  aspect: [1, 1],
+  quality: 0.8,
+});
     if (!result.canceled) {
       const uri = result.assets[0].uri;
       setAvatarUri(uri);
       await AsyncStorage.setItem("avatarUri", uri);
     }
   };
+
+if (screen === "profile") {
+    return (
+      <ScrollView style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={goBack} style={{ marginBottom: 12 }}>
+            <Ionicons name="arrow-back" size={22} color="#0e1f42" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Profile Details</Text>
+        </View>
+
+        <View style={[styles.profileCard, { flexDirection: 'column', alignItems: 'center', gap: 12 }]}>
+          <TouchableOpacity style={[styles.avatar, { width: 72, height: 72, borderRadius: 36 }]} onPress={handlePickImage}>
+            {avatarUri ? (
+              <Image source={{ uri: avatarUri }} style={[styles.avatarImage, { borderRadius: 36 }]} />
+            ) : (
+              <Text style={[styles.avatarText, { fontSize: 28 }]}>{fullName ? fullName[0].toUpperCase() : "?"}</Text>
+            )}
+            <View style={styles.avatarEditBadge}>
+              <Ionicons name="camera" size={10} color="#fff" />
+            </View>
+          </TouchableOpacity>
+          <Text style={[styles.profileName, { fontSize: 18 }]}>{fullName}</Text>
+          <Text style={styles.profileEmail}>{email}</Text>
+        </View>
+
+        <View style={[styles.section, { marginTop: 8 }]}>
+          <View style={styles.menuCard}>
+            {[
+              { label: "Full Name", value: fullName, icon: "person-outline" },
+              { label: "Email Address", value: email, icon: "mail-outline" },
+              { label: "Account Status", value: "Verified", icon: "checkmark-circle-outline", color: "#059669" },
+            ].map((item, i, arr) => (
+              <View key={item.label}>
+                <View style={[styles.menuItem, { gap: 14 }]}>
+                  <View style={styles.menuIconBox}>
+                    <Ionicons name={item.icon as any} size={18} color="#2563eb" />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 11, color: "#9ca3af", fontWeight: "600", marginBottom: 2 }}>{item.label}</Text>
+                    <Text style={{ fontSize: 15, fontWeight: "700", color: item.color || "#111827" }}>{item.value}</Text>
+                  </View>
+                </View>
+                {i < arr.length - 1 && <View style={{ height: 1, backgroundColor: "#f3f4f6", marginLeft: 64 }} />}
+              </View>
+            ))}
+          </View>
+        </View>
+      </ScrollView>
+    );
+  }
+
+  if (screen === "security") {
+    return (
+      <ScrollView style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={goBack} style={{ marginBottom: 12 }}>
+            <Ionicons name="arrow-back" size={22} color="#0e1f42" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Security</Text>
+        </View>
+        <View style={styles.section}>
+          <View style={styles.menuCard}>
+            {[
+             { label: "Change Password", icon: "lock-closed-outline", color: "#059669", bg: "#f0fdf4", onPress: () => navigateTo("changePassword") },
+             { label: "Logout All Devices", icon: "phone-portrait-outline", color: "#059669", bg: "#f0fdf4", onPress: () => Alert.alert("Logout All Devices", "This will end all active sessions.", [{ text: "Cancel", style: "cancel" }, { text: "Confirm", style: "destructive", onPress: async () => {
+  try {
+    const uid = await AsyncStorage.getItem("uid");
+    await axios.post(`${API_BASE_URL}/auth/logout-all-devices`, { uid });
+  } catch {}
+  await AsyncStorage.clear();
+  router.replace("/(auth)/login" as any);
+} }]) },
+            { label: "Delete Account", icon: "trash-outline", color: "#ef4444", bg: "#fff1f2", onPress: () => {
+  Alert.alert(
+    "Delete Account",
+    "Are you sure you want to delete your account? This will permanently remove all your data.",
+    [
+      { text: "Cancel", style: "cancel" },
+      { text: "Yes, Delete", style: "destructive", onPress: () => {
+        Alert.alert(
+          "Final Warning",
+          "This action is irreversible. All your 2FA accounts and data will be lost forever. Continue?",
+          [
+            { text: "Cancel", style: "cancel" },
+            { text: "Delete Forever", style: "destructive", onPress: async () => {
+              try {
+                const uid = await AsyncStorage.getItem("uid");
+                await axios.delete(`${API_BASE_URL}/auth/delete-account`, { data: { uid } });
+              } catch {}
+              await AsyncStorage.clear();
+              router.replace("/(auth)/login" as any);
+            }}
+          ]
+        );
+      }}
+    ]
+  );
+}},
+            ].map((item, i, arr) => (
+              <View key={item.label}>
+                <TouchableOpacity style={styles.menuItem} onPress={item.onPress}>
+                  <View style={[styles.menuIconBox, { backgroundColor: item.bg }]}>
+                    <Ionicons name={item.icon as any} size={18} color={item.color} />
+                  </View>
+                  <Text style={[styles.menuLabel, { color: item.color === "#ef4444" ? "#ef4444" : "#111827" }]}>{item.label}</Text>
+                  <Ionicons name="chevron-forward" size={16} color="#d1d5db" />
+                </TouchableOpacity>
+                {i < arr.length - 1 && <View style={{ height: 1, backgroundColor: "#f3f4f6", marginLeft: 64 }} />}
+              </View>
+            ))}
+          </View>
+        </View>
+      </ScrollView>
+    );
+  }
+
+if (screen === "changePassword") {
+    return (
+      <KeyboardAvoidingView
+        style={{ flex: 1, backgroundColor: "#f8faff" }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      >
+        <ScrollView
+          style={styles.container}
+          contentContainerStyle={{ paddingBottom: 40 }}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={styles.header}>
+            <TouchableOpacity onPress={goBack} style={{ marginBottom: 12 }}>
+              <Ionicons name="arrow-back" size={22} color="#0e1f42" />
+            </TouchableOpacity>
+            <Text style={styles.headerTitle}>Change Password</Text>
+          </View>
+
+          <View style={[styles.section, { marginTop: 8 }]}>
+            <View style={[styles.menuCard, { padding: 16, gap: 4 }]}>
+              <AuthInput
+                label="Current Password"
+                iconName="lock-closed-outline"
+                placeholder="Enter current password"
+                isPassword
+                value={currentPassword}
+                onChangeText={setCurrentPassword}
+              />
+              <AuthInput
+                label="New Password"
+                iconName="lock-open-outline"
+                placeholder="Enter new password"
+                isPassword
+                value={newPassword}
+                onChangeText={setNewPassword}
+              />
+              <AuthInput
+                label="Confirm New Password"
+                iconName="lock-open-outline"
+                placeholder="Confirm new password"
+                isPassword
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
+              />
+
+              <View style={{ gap: 6, marginTop: 8 }}>
+                {[
+                  { rule: "At least 8 characters", ok: newPassword.length >= 8 },
+                  { rule: "One uppercase letter", ok: /[A-Z]/.test(newPassword) },
+                  { rule: "One number", ok: /[0-9]/.test(newPassword) },
+                  { rule: "Passwords match", ok: newPassword === confirmPassword && confirmPassword.length > 0 },
+                ].map((r) => (
+                  <View key={r.rule} style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                    <Ionicons name={r.ok ? "checkmark-circle" : "ellipse-outline"} size={14} color={r.ok ? "#059669" : "#9ca3af"} />
+                    <Text style={{ fontSize: 12, color: r.ok ? "#059669" : "#9ca3af" }}>{r.rule}</Text>
+                  </View>
+                ))}
+              </View>
+
+              {pwError ? <Text style={{ color: "#ef4444", fontSize: 13, fontWeight: "600", marginTop: 8 }}>{pwError}</Text> : null}
+              {pwSuccess ? <Text style={{ color: "#059669", fontSize: 13, fontWeight: "600", marginTop: 8 }}>{pwSuccess}</Text> : null}
+
+              <TouchableOpacity
+                style={[styles.dangerBtn, { backgroundColor: "#0e1f42", borderColor: "#0e1f42", marginTop: 16 }, (pwLoading || !currentPassword || !newPassword || !confirmPassword) && { opacity: 0.6 }]}
+                onPress={handleChangePassword}
+                disabled={pwLoading || !currentPassword || !newPassword || !confirmPassword}
+              >
+                {pwLoading ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <Text style={[styles.dangerText, { color: "#fff" }]}>Change Password</Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    );
+  }
+
+  if (screen === "legal") {
+    return (
+      <ScrollView style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={goBack} style={{ marginBottom: 12 }}>
+            <Ionicons name="arrow-back" size={22} color="#0e1f42" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Legal</Text>
+        </View>
+        <View style={styles.section}>
+          <View style={styles.menuCard}>
+            {[
+              { label: "Terms & Conditions", icon: "document-text-outline", url: "https://authlyapp.vercel.app/terms" },
+              { label: "Privacy Policy", icon: "shield-checkmark-outline", url: "https://authlyapp.vercel.app/privacy" },
+              { label: "Copyright Policy", icon: "copy-outline", url: "https://authlyapp.vercel.app/copyright" },
+            ].map((item, i, arr) => (
+              <View key={item.label}>
+                <TouchableOpacity style={styles.menuItem} onPress={() => Linking.openURL(item.url)}>
+                  <View style={[styles.menuIconBox, { backgroundColor: "#f0f9ff" }]}>
+                    <Ionicons name={item.icon as any} size={18} color="#0ea5e9" />
+                  </View>
+                  <Text style={styles.menuLabel}>{item.label}</Text>
+                  <Ionicons name="chevron-forward" size={16} color="#d1d5db" />
+                </TouchableOpacity>
+                {i < arr.length - 1 && <View style={{ height: 1, backgroundColor: "#f3f4f6", marginLeft: 64 }} />}
+              </View>
+            ))}
+          </View>
+        </View>
+      </ScrollView>
+    );
+  }
 
   return (
     <ScrollView style={styles.container}>
@@ -107,19 +408,25 @@ export default function SettingsScreen() {
         </View>
       </View>
 
-      <View style={styles.section}>
+<View style={styles.section}>
         <Text style={styles.sectionLabel}>ACCOUNT</Text>
         <View style={styles.menuCard}>
-          <TouchableOpacity
-            style={styles.menuItem}
-            onPress={() => setProfileVisible(true)}
-          >
-            <View style={[styles.menuIconBox, { backgroundColor: "#eff6ff" }]}>
-              <Ionicons name="person-outline" size={18} color="#2563eb" />
+          {[
+            { label: "Profile", icon: "person-outline", bg: "#eff6ff", color: "#2563eb", onPress: () => navigateTo("profile") },
+            { label: "Security", icon: "lock-closed-outline", bg: "#f0fdf4", color: "#059669", onPress: () => navigateTo("security") },
+            { label: "Legal", icon: "document-text-outline", bg: "#f0f9ff", color: "#0ea5e9", onPress: () => navigateTo("legal") },
+          ].map((item, i, arr) => (
+            <View key={item.label}>
+              <TouchableOpacity style={styles.menuItem} onPress={item.onPress}>
+                <View style={[styles.menuIconBox, { backgroundColor: item.bg }]}>
+                  <Ionicons name={item.icon as any} size={18} color={item.color} />
+                </View>
+                <Text style={styles.menuLabel}>{item.label}</Text>
+                <Ionicons name="chevron-forward" size={16} color="#d1d5db" />
+              </TouchableOpacity>
+              {i < arr.length - 1 && <View style={{ height: 1, backgroundColor: "#f3f4f6", marginLeft: 64 }} />}
             </View>
-            <Text style={styles.menuLabel}>Profile</Text>
-            <Ionicons name="chevron-forward" size={16} color="#d1d5db" />
-          </TouchableOpacity>
+          ))}
         </View>
       </View>
 
@@ -130,90 +437,7 @@ export default function SettingsScreen() {
         </TouchableOpacity>
       </View>
 
-      <Modal visible={profileVisible} animationType="slide" transparent>
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalSheet}>
-            <View style={styles.modalHandle} />
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Profile Details</Text>
-              <TouchableOpacity
-                onPress={() => setProfileVisible(false)}
-                style={styles.modalClose}
-              >
-                <Ionicons name="close" size={20} color="#6b7280" />
-              </TouchableOpacity>
-            </View>
-
-            <TouchableOpacity
-              style={styles.modalAvatar}
-              onPress={handlePickImage}
-            >
-              {avatarUri ? (
-                <Image
-                  source={{ uri: avatarUri }}
-                  style={styles.modalAvatarImage}
-                />
-              ) : (
-                <Text style={styles.modalAvatarText}>
-                  {fullName ? fullName[0].toUpperCase() : "?"}
-                </Text>
-              )}
-              <View style={styles.modalAvatarEditBadge}>
-                <Ionicons name="camera" size={12} color="#fff" />
-              </View>
-            </TouchableOpacity>
-
-            <View style={styles.detailRow}>
-              <View style={styles.detailIconBox}>
-                <Ionicons name="person-outline" size={18} color="#2563eb" />
-              </View>
-              <View>
-                <Text style={styles.detailLabel}>Full Name</Text>
-                <Text style={styles.detailValue}>{fullName}</Text>
-              </View>
-            </View>
-
-            <View style={styles.detailDivider} />
-
-            <View style={styles.detailRow}>
-              <View style={styles.detailIconBox}>
-                <Ionicons name="mail-outline" size={18} color="#2563eb" />
-              </View>
-              <View>
-                <Text style={styles.detailLabel}>Email Address</Text>
-                <Text style={styles.detailValue}>{email}</Text>
-              </View>
-            </View>
-
-            <View style={styles.detailDivider} />
-
-            <View style={styles.detailRow}>
-              <View
-                style={[styles.detailIconBox, { backgroundColor: "#f0fdf4" }]}
-              >
-                <Ionicons
-                  name="checkmark-circle-outline"
-                  size={18}
-                  color="#059669"
-                />
-              </View>
-              <View>
-                <Text style={styles.detailLabel}>Account Status</Text>
-                <Text style={[styles.detailValue, { color: "#059669" }]}>
-                  Verified
-                </Text>
-              </View>
-            </View>
-
-            <TouchableOpacity
-              style={styles.modalCloseBtn}
-              onPress={() => setProfileVisible(false)}
-            >
-              <Text style={styles.modalCloseBtnText}>Close</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
+    
     </ScrollView>
   );
 }

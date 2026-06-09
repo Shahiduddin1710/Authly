@@ -92,8 +92,7 @@ export default function RootLayout() {
         <Stack.Screen name="add-account/index" />
         <Stack.Screen name="add-account/manual" />
         <Stack.Screen name="edit-account/[id]" />
-        <Stack.Screen name="privacy" />
-        <Stack.Screen name="terms" />
+       <Stack.Screen name="legal/terms" />
       </Stack>
       <Toast />
     </SafeAreaProvider>

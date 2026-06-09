@@ -128,12 +128,12 @@ export default function SignupScreen() {
             </TouchableOpacity>
           </View>
 
-          <View style={styles.bottomLinks}>
-            <TouchableOpacity onPress={() => router.push("/terms" as any)}>
+     <View style={styles.bottomLinks}>
+            <TouchableOpacity onPress={() => router.push({ pathname: "/legal/terms", params: { type: "terms" } } as any)}>
               <Text style={styles.bottomLink}>Terms & Conditions</Text>
             </TouchableOpacity>
             <Text style={styles.bottomDot}>·</Text>
-            <TouchableOpacity onPress={() => router.push("/privacy" as any)}>
+            <TouchableOpacity onPress={() => router.push({ pathname: "/legal/terms", params: { type: "privacy" } } as any)}>
               <Text style={styles.bottomLink}>Privacy Policy</Text>
             </TouchableOpacity>
           </View>

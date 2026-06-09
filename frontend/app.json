@@ -2,18 +2,22 @@
   "expo": {
     "name": "Authly",
     "slug": "authly",
+    "owner": "shaho",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "authly",
     "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
     "newArchEnabled": true,
-
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.authly.app"
     },
-
     "android": {
       "package": "com.authly.app",
       "adaptiveIcon": {
@@ -21,14 +25,17 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE"
+      ]
     },
-
     "web": {
       "output": "static",
       "favicon": "./assets/images/favicon.png"
     },
-
     "plugins": [
       "expo-router",
       [
@@ -36,16 +43,23 @@
         {
           "cameraPermission": "Allow Authly to access your camera to scan QR codes."
         }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow Authly to access your photos to upload QR codes."
+        }
       ]
     ],
-
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
     },
-
     "extra": {
-      "router": {}
+      "router": {},
+      "eas": {
+        "projectId": "a52cb350-0866-4788-a969-03cc59ea0102"
+      }
     }
   }
 }

@@ -6,18 +6,18 @@ import NetInfo from "@react-native-community/netinfo";
 import axios from "axios";
 import { router, useFocusEffect } from "expo-router";
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import * as Clipboard from "expo-clipboard";
 import {
   ActivityIndicator,
-  Alert,
   Animated,
-  Clipboard,
   FlatList,
   Image,
+  Modal,
   RefreshControl,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -242,29 +242,28 @@ export default function VaultScreen() {
     await fetchAccounts(uid, true);
   };
 
-  const handleCopy = (id: string, code: string) => {
-    Clipboard.setString(code.replace(" ", ""));
-    setCopiedId(id);
-    setTimeout(() => setCopiedId(null), 2000);
-  };
+const handleCopy = async (id: string, code: string) => {
+  await Clipboard.setStringAsync(code.replace(" ", ""));
+  setCopiedId(id);
+  setTimeout(() => setCopiedId(null), 2000);
+};
+
+const [deleteModal, setDeleteModal] = useState<{ id: string; name: string } | null>(null);
 
   const handleDelete = (accountId: string, serviceName: string) => {
-    Alert.alert("Remove Account", `Remove ${serviceName} from your vault?`, [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Remove",
-        style: "destructive",
-        onPress: async () => {
-          setDeletingId(accountId);
-          try {
-            await axios.delete(`${API_BASE_URL}/accounts/${uid}/${accountId}`);
-            await fetchAccounts(uid);
-          } finally {
-            setDeletingId(null);
-          }
-        },
-      },
-    ]);
+    setDeleteModal({ id: accountId, name: serviceName });
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteModal) return;
+    setDeletingId(deleteModal.id);
+    setDeleteModal(null);
+    try {
+      await axios.delete(`${API_BASE_URL}/accounts/${uid}/${deleteModal.id}`);
+      await fetchAccounts(uid);
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   const handleEdit = (item: Account) => {
@@ -387,8 +386,8 @@ export default function VaultScreen() {
           <Ionicons name="shield-checkmark" size={18} color="#0e1f42" />
           <Text style={styles.brandName}>Authly</Text>
         </View>
-        <TouchableOpacity onPress={() => router.push("/add-account" as any)}>
-          <Ionicons name="ellipsis-vertical" size={20} color="#6b7280" />
+      <TouchableOpacity onPress={() => router.push("/add-account" as any)}>
+          <Ionicons name="add" size={26} color="#0e1f42" />
         </TouchableOpacity>
       </View>
 
@@ -441,16 +440,31 @@ export default function VaultScreen() {
         />
       )}
 
-      <TouchableOpacity
-        style={[styles.fab, { bottom: Math.max(insets.bottom - 30, 20) }]}
-        onPress={() => router.push("/add-account" as any)}
-      >
-        <Ionicons name="add" size={28} color="#fff" />
-      </TouchableOpacity>
+
+<Modal visible={!!deleteModal} transparent animationType="fade">
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalBox}>
+            <View style={styles.modalIconWrap}>
+              <Ionicons name="trash-outline" size={28} color="#ef4444" />
+            </View>
+            <Text style={styles.modalTitle}>Remove Account</Text>
+            <Text style={styles.modalMsg}>
+              Remove <Text style={{ fontWeight: "700", color: "#0e1f42" }}>{deleteModal?.name}</Text> from your vault? This cannot be undone.
+            </Text>
+            <View style={styles.modalActions}>
+              <TouchableOpacity style={styles.modalCancel} onPress={() => setDeleteModal(null)}>
+                <Text style={styles.modalCancelText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.modalDelete} onPress={confirmDelete}>
+                <Text style={styles.modalDeleteText}>Remove</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#f8faff", overflow: "hidden" },
   offlineBanner: {
@@ -622,24 +636,79 @@ const styles = StyleSheet.create({
     borderRadius: 2,
     overflow: "hidden",
   },
-  progressFill: {
+progressFill: {
     height: 3,
     borderRadius: 2,
   },
-  fab: {
-    position: "absolute",
-    bottom: 80,
-    right: 20,
-    width: 52,
-    height: 52,
-    borderRadius: 26,
-    backgroundColor: "#0e1f42",
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
     justifyContent: "center",
     alignItems: "center",
-    shadowColor: "#0e1f42",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 8,
-    elevation: 6,
+    padding: 32,
   },
+  modalBox: {
+    backgroundColor: "#ffffff",
+    borderRadius: 20,
+    padding: 24,
+    width: "100%",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.12,
+    shadowRadius: 24,
+    elevation: 8,
+  },
+  modalIconWrap: {
+    width: 56,
+    height: 56,
+    borderRadius: 16,
+    backgroundColor: "#fff1f2",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "800",
+    color: "#0e1f42",
+    marginBottom: 8,
+  },
+  modalMsg: {
+    fontSize: 14,
+    color: "#6b7280",
+    textAlign: "center",
+    lineHeight: 22,
+    marginBottom: 24,
+  },
+  modalActions: {
+    flexDirection: "row",
+    gap: 12,
+    width: "100%",
+  },
+  modalCancel: {
+    flex: 1,
+    padding: 14,
+    borderRadius: 12,
+    backgroundColor: "#f3f4f6",
+    alignItems: "center",
+  },
+  modalCancelText: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: "#374151",
+  },
+  modalDelete: {
+    flex: 1,
+    padding: 14,
+    borderRadius: 12,
+    backgroundColor: "#ef4444",
+    alignItems: "center",
+  },
+  modalDeleteText: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: "#ffffff",
+  },
+
 });

@@ -104,13 +104,20 @@ export default function LoginScreen() {
               </TouchableOpacity>
             </View>
 
-            <Text style={styles.terms}>
+           <Text style={styles.terms}>
               By continuing, you agree to our{" "}
               <Text
                 style={styles.termsLink}
-                onPress={() => router.push("/terms" as any)}
+               onPress={() => router.navigate({ pathname: "/legal/terms", params: { type: "terms" } } as any)}
               >
                 Terms & Conditions
+              </Text>
+              {" & "}
+              <Text
+                style={styles.termsLink}
+                onPress={() => router.navigate({ pathname: "/legal/terms", params: { type: "privacy" } } as any)}
+              >
+                Privacy Policy
               </Text>
             </Text>
           </View>

@@ -47,13 +47,24 @@ export default function ForgotPasswordScreen() {
     }
   };
 
-  const handleVerifyOTP = async () => {
+const handleVerifyOTP = async () => {
     const code = otp.join("");
     if (code.length < 6) {
       Alert.alert("Error", "Please enter the complete 6-digit code");
       return;
     }
-    setStep("password");
+    setLoading(true);
+    try {
+      await axios.post(`${API_BASE_URL}/auth/verify-reset-otp`, {
+        email,
+        otp: code,
+      });
+      setStep("password");
+    } catch (err: any) {
+      Alert.alert("Error", err.response?.data?.error || "Invalid OTP");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleResetPassword = async () => {
@@ -172,8 +183,8 @@ export default function ForgotPasswordScreen() {
                   />
                 ))}
               </View>
-              <TouchableOpacity style={styles.button} onPress={handleVerifyOTP}>
-                <Text style={styles.buttonText}>Verify Code</Text>
+            <TouchableOpacity style={styles.button} onPress={handleVerifyOTP} disabled={loading}>
+                {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Verify Code</Text>}
               </TouchableOpacity>
             </>
           )}

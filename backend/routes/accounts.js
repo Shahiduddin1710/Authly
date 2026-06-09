@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const { db } = require("../config/firebase");
 const { authenticator } = require("otplib");
-const sharp = require("sharp");
 const jsQR = require("jsqr");
 
 router.post("/scan-qr", async (req, res) => {
@@ -13,25 +12,27 @@ router.post("/scan-qr", async (req, res) => {
   }
 
   try {
+    const Jimp = require("jimp");
+    const jsQR = require("jsqr");
+
     const buffer = Buffer.from(imageBase64, "base64");
+    const image = await Jimp.read(buffer);
 
-    const { data, info } = await sharp(buffer)
-      .resize(800, 800, { fit: "inside" })
-      .ensureAlpha()
-      .raw()
-      .toBuffer({ resolveWithObject: true });
+    image.resize(600, Jimp.AUTO);
 
-    const code = jsQR(new Uint8ClampedArray(data), info.width, info.height, {
+    const { data, width, height } = image.bitmap;
+    const uint8 = new Uint8ClampedArray(data);
+
+    const code = jsQR(uint8, width, height, {
       inversionAttempts: "attemptBoth",
     });
 
     if (!code) {
-      return res.status(400).json({ error: "No QR code found in image. Make sure the QR code is clear and fully visible." });
+      return res.status(400).json({ error: "No QR code found. Make sure QR is clear and fully visible." });
     }
 
-    console.log("QR data found:", code.data);
-
     const qrData = code.data;
+    console.log("QR found:", qrData);
 
     if (!qrData.startsWith("otpauth://")) {
       return res.status(400).json({ error: "Not a valid 2FA QR code" });
@@ -45,7 +46,7 @@ router.post("/scan-qr", async (req, res) => {
     const serviceName = issuer || (label.includes(":") ? label.split(":")[0].trim() : "Unknown");
 
     if (!secretKey) {
-      return res.status(400).json({ error: "QR code found but no secret key detected" });
+      return res.status(400).json({ error: "No secret key found in QR code" });
     }
 
     return res.status(200).json({ serviceName, accountEmail, secretKey });

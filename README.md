@@ -1,5 +1,15 @@
 # Authly – Secure 2FA Authenticator App
 
+## Download the App
+
+Visit the official Authly website to download the latest Android APK:
+
+🌐 **https://authlyapp.vercel.app**
+
+> Download the latest Authly APK and securely manage all your 2-Factor Authentication (2FA) accounts in one place.
+
+---
+
 ## Overview
 
 Authly is a modern, secure, and minimal 2-Factor Authentication (2FA) mobile application built using React Native (Expo) and Node.js.

@@ -46,6 +46,7 @@ export default function ManualEntryScreen() {
         accountEmail,
         secretKey: cleanKey,
       });
+   await AsyncStorage.removeItem("vault_accounts_cache");
       Alert.alert("Success", `${serviceName} added to your vault!`, [
         { text: "OK", onPress: () => router.replace("/(tabs)/vault" as any) },
       ]);

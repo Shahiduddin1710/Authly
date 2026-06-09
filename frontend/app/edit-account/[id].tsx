@@ -1,22 +1,22 @@
+import AuthInput from "@/components/AuthInput";
+import { API_BASE_URL } from "@/constants/api";
+import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
+import * as Clipboard from "expo-clipboard";
+import { router, useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
   ActivityIndicator,
   Alert,
   KeyboardAvoidingView,
   Platform,
-  Clipboard,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { router, useLocalSearchParams } from "expo-router";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from "axios";
-import { Ionicons } from "@expo/vector-icons";
-import { API_BASE_URL } from "@/constants/api";
-import AuthInput from "@/components/AuthInput";
 
 export default function EditAccountScreen() {
   const {
@@ -37,11 +37,11 @@ export default function EditAccountScreen() {
   const [loading, setLoading] = useState(false);
   const [keyCopied, setKeyCopied] = useState(false);
 
-  const handleCopyKey = () => {
-    Clipboard.setString(secretKey);
-    setKeyCopied(true);
-    setTimeout(() => setKeyCopied(false), 2000);
-  };
+ const handleCopyKey = async () => {
+  await Clipboard.setStringAsync(secretKey);
+  setKeyCopied(true);
+  setTimeout(() => setKeyCopied(false), 2000);
+};
 
   const handleSave = async () => {
     if (!serviceName) {
@@ -71,16 +71,16 @@ export default function EditAccountScreen() {
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1, backgroundColor: "#f5f6fa" }}
+      style={{ flex: 1, backgroundColor: "#f8faff" }}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <View style={styles.topBar}>
         <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
-          <Ionicons name="arrow-back" size={20} color="#374151" />
+          <Ionicons name="arrow-back" size={20} color="#0e1f42" />
         </TouchableOpacity>
         <View style={styles.brandRow}>
-          <Ionicons name="shield-checkmark" size={18} color="#2563eb" />
-          <Text style={styles.brandName}>SafeAuth</Text>
+          <Ionicons name="shield-checkmark" size={18} color="#0e1f42" />
+          <Text style={styles.brandName}>Authly</Text>
         </View>
         <View style={{ width: 40 }} />
       </View>
@@ -118,7 +118,7 @@ export default function EditAccountScreen() {
                 <Ionicons
                   name={keyCopied ? "checkmark" : "copy-outline"}
                   size={14}
-                  color={keyCopied ? "#059669" : "#2563eb"}
+                  color={keyCopied ? "#059669" : "#0e1f42"}
                 />
                 <Text style={[styles.copyKeyText, keyCopied && { color: "#059669" }]}>
                   {keyCopied ? "Copied!" : "Copy"}
@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 56,
     paddingBottom: 16,
-    backgroundColor: "#f5f6fa",
+    backgroundColor: "#f8faff",
   },
   backBtn: {
     width: 40,
@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   brandRow: { flexDirection: "row", alignItems: "center", gap: 8 },
-  brandName: { fontSize: 15, fontWeight: "800", color: "#2563eb" },
+  brandName: { fontSize: 15, fontWeight: "800", color: "#0e1f42" },
   container: {
     flexGrow: 1,
     alignItems: "center",
@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
   heading: {
     fontSize: 22,
     fontWeight: "800",
-    color: "#111827",
+    color: "#0e1f42",
     marginBottom: 4,
   },
   subheading: {
@@ -222,7 +222,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   secretKeyBox: {
-    backgroundColor: "#f8fafc",
+    backgroundColor: "#f8faff",
     borderRadius: 12,
     padding: 16,
     marginBottom: 20,
@@ -245,17 +245,17 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 5,
-    backgroundColor: "#eff6ff",
+    backgroundColor: "#eef1f8",
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#dbeafe",
+    borderColor: "#d4daea",
   },
   copyKeyText: {
     fontSize: 12,
     fontWeight: "700",
-    color: "#2563eb",
+    color: "#0e1f42",
   },
   secretValueRow: {
     flexDirection: "row",
@@ -272,7 +272,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 13,
     fontWeight: "700",
-    color: "#374151",
+    color: "#0e1f42",
     letterSpacing: 1.5,
     lineHeight: 20,
     fontFamily: Platform.OS === "ios" ? "Courier" : "monospace",
@@ -289,7 +289,7 @@ const styles = StyleSheet.create({
     lineHeight: 16,
   },
   button: {
-    backgroundColor: "#2563eb",
+    backgroundColor: "#0e1f42",
     borderRadius: 12,
     height: 52,
     justifyContent: "center",

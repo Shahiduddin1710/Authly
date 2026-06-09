@@ -3,10 +3,10 @@ import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
+  Animated,
   ScrollView,
   StyleSheet,
   Text,
@@ -17,6 +17,18 @@ import {
 export default function SecurityScreen() {
   const [syncing, setSyncing] = useState(false);
   const [lastSync, setLastSync] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
+  const toastAnim = useRef(new Animated.Value(0)).current;
+
+  const showToast = (message: string, type: "success" | "error") => {
+    setToast({ message, type });
+    toastAnim.setValue(0);
+    Animated.sequence([
+      Animated.timing(toastAnim, { toValue: 1, duration: 300, useNativeDriver: true }),
+      Animated.delay(2500),
+      Animated.timing(toastAnim, { toValue: 0, duration: 300, useNativeDriver: true }),
+    ]).start(() => setToast(null));
+  };
 
   const handleSync = async () => {
     setSyncing(true);
@@ -26,15 +38,16 @@ export default function SecurityScreen() {
       await axios.get(`${API_BASE_URL}/accounts/${uid}`);
       const now = new Date().toLocaleTimeString();
       setLastSync(now);
-      Alert.alert("Synced", "Your vault is up to date with the cloud.");
+     showToast("Vault is up to date with the cloud.", "success");
     } catch {
-      Alert.alert("Error", "Sync failed. Check your connection.");
+      showToast("Sync failed. Check your connection.", "error");
     } finally {
       setSyncing(false);
     }
   };
 
-  return (
+ return (
+    <View style={{ flex: 1 }}>
     <ScrollView style={styles.container}>
       <View style={styles.header}>
         <View style={styles.brandRow}>
@@ -76,10 +89,26 @@ export default function SecurityScreen() {
           </TouchableOpacity>
         </View>
       </View>
-    </ScrollView>
+</ScrollView>
+    {toast && (
+      <Animated.View
+        pointerEvents="none"
+        style={[
+          styles.toast,
+          toast.type === "success" ? styles.toastSuccess : styles.toastError,
+          {
+            opacity: toastAnim,
+            transform: [{ translateY: toastAnim.interpolate({ inputRange: [0, 1], outputRange: [20, 0] }) }],
+          },
+        ]}
+      >
+        <Ionicons name={toast.type === "success" ? "checkmark-circle" : "close-circle"} size={16} color="#fff" />
+        <Text style={styles.toastText}>{toast.message}</Text>
+      </Animated.View>
+    )}
+    </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#f8faff" },
   header: {
@@ -141,5 +170,19 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#bbf7d0",
   },
-  syncText: { fontSize: 12, fontWeight: "700", color: "#059669" },
+syncText: { fontSize: 12, fontWeight: "700", color: "#059669" },
+toast: {
+    position: "absolute",
+    bottom: 16,
+    left: 24,
+    right: 24,
+    borderRadius: 12,
+    padding: 14,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  toastSuccess: { backgroundColor: "#059669" },
+  toastError: { backgroundColor: "#ef4444" },
+  toastText: { color: "#fff", fontSize: 13, fontWeight: "600", flex: 1 },
 });
