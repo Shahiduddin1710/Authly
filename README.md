@@ -85,4 +85,4 @@ It allows users to securely store their 2FA accounts, generate real-time OTP cod
 
 ## Author
 
-Shahiduddin (Shaho) – VCET Vasai
+Shahiduddin (Shaho)
