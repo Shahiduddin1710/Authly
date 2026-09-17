@@ -31,7 +31,6 @@ It allows users to securely store their 2FA accounts, generate real-time OTP cod
 - Add accounts via QR code scanning
 - Manual secret key entry
 - Real-time TOTP generation (30s refresh)
-- Copy OTP instantly
 - Edit and delete accounts
 
 ### Cloud Sync
